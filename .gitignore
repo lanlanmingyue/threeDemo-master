@@ -1,0 +1,9 @@
+.DS_Store
+node_modules
+.idea/
+npm-debug.log
+.jshintrc
+.src/js/circle.js
+index.html
+three_test/src/textures/
+three_test/src/sounds/

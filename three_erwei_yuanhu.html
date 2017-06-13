@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <script src="./src/three.js" type="text/JavaScript"></script>
+        
+    </head>
+    <body>
+<!--     <canvas id="canvas" width="600px" height="600px" style="margin: auto; display: block;background-color: pink"></canvas> -->
+    <script  type="text/javascript" >
+     // 老三样 场景scene，相机camera，渲染器render
+        var scene=new THREE.Scene();
+        // 相机
+        var camera = new THREE.PerspectiveCamera(45,1,1,1000);
+        camera.position.set(0,0,100);
+        camera.lookAt(new THREE.Vector3(0,0,0)); 
+        // 渲染器
+        var renderer=new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        //显示在窗体
+        document.body.appendChild(renderer.domElement);     
+        /**
+     * 创建点模型
+     */
+    var shape = new THREE.Shape();
+    shape.absarc(0,0,100, 0, 0.5*Math.PI);
+    var geometry = new THREE.ShapeGeometry(shape);
+    var material=new THREE.PointsMaterial({
+        color:0x0000ff,
+        size:10.0//点对象像素尺寸
+    });//材质对象
+    var line=new THREE.Points(geometry,material);//点模型对象
+    scene.add(line);//点模型添加到场景中
+        renderer.render(scene,camera);  
+    </script>
+    </body>
+</html>

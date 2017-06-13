@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="utf-8"/>
+        <title>三角与立方体旋转</title>
+        <style>body {background: #000000;overflow: hidden;}</style>
+        <script src="./src/three.js"></script>
+        <script src="./src/js/Detector.js"></script>
+  <!--       <script src="./src/js/CanvasRenderer.js"></script>
+        <script src="./src/js/Projector.js"></script> -->
+   </head> 
+   <body>
+        <script>
+      var scene = new THREE.Scene();
+      var canvasWidth = window.innerWidth;
+      var canvasHeight = window.innerHeight;
+      
+      var renderer;
+      if(Detector.webgl){ 
+        renderer = new THREE.WebGLRenderer({antialias:true});
+            } else { 
+        renderer = new THREE.CanvasRenderer(); 
+      }
+      renderer.setClearColor(0x000000, 1);
+      renderer.setSize(canvasWidth, canvasHeight);
+      document.body.appendChild(renderer.domElement);
+      
+      var camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
+      camera.position.set(0, 0, 10);
+      camera.lookAt(scene.position);
+      scene.add(camera);
+      
+            // To create a pyramid, we use THREE.CylinderGeometry. By its five parameters, we are 
+            // able to create the geometry of the pyramid (subtype of a cylinder). 
+            // Parameter 1 'radiusTop': 圆柱顶部半径。如果值设置为0， 顶部将是一个点，我们会得到一个锥体
+            // Parameter 2 'radiusBottom': 圆柱底部半径 
+            // Parameter 3 'height': 圆柱的高 
+            // Parameter 4 'segments': 构成圆柱体壳的段片。为了创建一个金字塔形, 我们把值设为4
+            // Parameter 5 'openEnded': 是否允许末端（底部）开口。为了金字塔有一个底面，我们把值设为false
+            var pyramidGeometry = new THREE.CylinderGeometry(0, 1.5, 1.5, 4, false);
+      
+            // Coloring the faces with vertex colors is a bit tricky, but allows us to see how to 
+            // loop through the faces and check whether they have three or four vertices. 
+            // With a simple 'for'-loop we run through all faces, which are accessed by their index.
+            // The 'instanceof' operator gives the possibility to check, whether the current face is 
+            // a THREE.Face4 or THREE.Face3. Depending on its object type, we set three or four 
+            // vertex colors. For THREE.Face4 we switch the colors of vertex 1 and 2 for every 
+            // second face because we want the lower vertices having the same colors as the 
+            // neighbour face. Vertex 0 and 3 are the upper vertices, which are always red. 
+            // If WebGL isn't supported and the canvas renderer is used, it ignores the vertex 
+            // colors. They are only supported by the WebGL renderer (current release of 
+            // Three.js: 49). 
+            for(i = 0; i < pyramidGeometry.faces.length; i++){ 
+                if(pyramidGeometry.faces[i] instanceof THREE.Face4){  //如果是4个顶点的面
+          pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000); 
+                    if((i % 2) == 0){
+                        pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
+                        pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
+                    } else {
+            pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x0000FF);
+                        pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x00FF00);
+                    }
+          pyramidGeometry.faces[i].vertexColors[3] = new THREE.Color(0xFF0000);
+                } else {  //如果是3个顶点的面
+                    pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000);
+                    pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
+                    pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
+                }
+            } 
+            
+      var pyramidMaterial = new THREE.MeshBasicMaterial({ 
+                vertexColors:THREE.VertexColors, 
+                side:THREE.DoubleSide 
+            });
+      
+            var pyramidMesh = new THREE.Mesh(pyramidGeometry, pyramidMaterial); 
+            pyramidMesh.position.set(-1.5, 0.0, 4.0); 
+            scene.add(pyramidMesh);
+            
+      // Create the cube 
+            // Parameter 1: 宽 
+            // Parameter 2: 高
+            // Parameter 3: 深
+            var boxGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); 
+ 
+            // Applying different materials to the faces is a more difficult than applying one 
+            // material to the whole geometry. We start with creating an array of 
+            // THREE.MeshBasicMaterial. 
+
+            // Define six colored materials 
+            var boxMaterials = [ 
+        new THREE.MeshBasicMaterial({color:0xFF0000}), 
+        new THREE.MeshBasicMaterial({color:0x00FF00}), 
+                new THREE.MeshBasicMaterial({color:0x0000FF}), 
+                new THREE.MeshBasicMaterial({color:0xFFFF00}), 
+                new THREE.MeshBasicMaterial({color:0x00FFFF}), 
+                new THREE.MeshBasicMaterial({color:0xFFFFFF}) 
+            ]; 
+
+            //创建一个MeshFaceMaterial，它允许立方体的每个面拥有不同的材质
+            var boxMaterial = new THREE.MeshFaceMaterial(boxMaterials);
+      
+            boxMesh = new THREE.Mesh(boxGeometry, boxMaterial); 
+            boxMesh.position.set(1.5, 0.0, 4.0); 
+            scene.add(boxMesh);
+      
+            function render(){
+        pyramidMesh.rotation.y += 0.1; 
+
+        // Decrease the rotation of the cube 
+        // Parameter 1: 旋转轴矢量 
+                // Parameter 2: 旋转速率
+        boxMesh.rotateOnAxis(new THREE.Vector3(1, 1, 1).normalize(), 0.075); 
+                
+        renderer.render(scene, camera);
+         
+        requestAnimationFrame(render);
+            }
+      render();
+       </script> 
+   </body> 
+</html>
